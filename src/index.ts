@@ -1,8 +1,25 @@
-import express, { type Express } from 'express'
+import express, { type Request, type Response, type Express } from 'express'
 
-import { PORT } from './config/environment'
+import { config } from './config/environment'
+
 import { initExpressServer } from './server'
+import { initializeQueues } from './queues'
+/* import { artistQueue } from './queues' */
 
 const app: Express = express()
+app.use(express.json())
 
-initExpressServer(app, Number(PORT) ?? 3000)
+app.get('/health', (request: Request, response: Response) => {
+  response
+    .status(200)
+    .json({
+      message: 'Works as expected',
+      info: {
+        url: `${request.protocol}://${request.hostname}${request.path}`
+      }
+    })
+    .end()
+})
+
+initializeQueues()
+initExpressServer(app, Number(config.port))
