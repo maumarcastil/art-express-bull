@@ -1,5 +1,37 @@
 version: '3.8'
 services:
+
+  my-service-dev:
+    container_name: my-service-dev
+    restart: unless-stopped
+    env_file: .env
+    build:
+      target: dev
+      context: .
+      args:
+        - PORT=${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+      - "9229:9229"
+    volumes:
+      - .:/project
+      - node_modules:/project/node_modules/
+      - ./package.json:/project/package.json  # Agregar esta línea para copiar el archivo de marca temporal
+
+    links:
+      - mongodb
+      - tor-proxy
+      - cache
+
+  tor-proxy:
+    image: dperson/torproxy
+    container_name: tor-proxy
+    ports:
+      - "127.0.0.1:9050:9050"
+      - "127.0.0.1:9051:9051"
+
+
+
   cache:
     image: redis:6.2-alpine
     restart: always
@@ -20,6 +52,7 @@ services:
       - mongo-data:/data/db
 
 volumes:
+  node_modules:
   cache:
     driver: local
   mongo-data:

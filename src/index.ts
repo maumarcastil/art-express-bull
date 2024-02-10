@@ -1,12 +1,14 @@
+import morgan from 'morgan'
 import express, { type Request, type Response, type Express } from 'express'
 
 import { config } from './config/environment'
 
-import { initExpressServer } from './server'
 import { initializeQueues } from './queues'
+import { initExpressServer } from './server'
 /* import { artistQueue } from './queues' */
 
 const app: Express = express()
+app.use(morgan('dev'))
 app.use(express.json())
 
 app.get('/health', (request: Request, response: Response) => {
